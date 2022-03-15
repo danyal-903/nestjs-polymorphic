@@ -1,17 +1,18 @@
 import { BullModule } from '@nestjs/bull';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import { MongooseModule } from '@nestjs/mongoose';
+import { ActivityModule } from './activity/activity.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { CourseModule } from './course/course.module';
 import { EnvironmentVariables, validate } from './env.validation';
-import { PolyModule } from './poly/poly.module';
 
 @Module({
   imports: [
-    PolyModule,
+    CourseModule,
     ConfigModule.forRoot({ isGlobal: true, validate }),
-    TypeOrmModule.forRoot(),
+    MongooseModule.forRoot('mongodb://localhost:27017/poly', { ssl: false }),
     BullModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (configService: ConfigService<EnvironmentVariables>) => ({
@@ -21,6 +22,7 @@ import { PolyModule } from './poly/poly.module';
         },
       }),
     }),
+    ActivityModule,
   ],
   controllers: [AppController],
   providers: [AppService],
